@@ -68,3 +68,12 @@ module.exports = {
 
 ```js
 ```
+
+```js
+module.exports = {
+  //...
+  watch: true
+};
+```
+
+npm install webpack-dev-server

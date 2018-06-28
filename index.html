@@ -5,9 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Currency Converter</title>
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
   <link rel="stylesheet" href="dist/main.css">
 </head>
 <body>
+  <div id="body-wrapper">
+    <h1 id="header">Currency Converter</h1>
+
+    <div id="currency-card">
+      <div id="titlebar">
+        <h2>From</h2>
+        <h2>To</h2>
+      </div>
+      <div id="select">
+        <select name="" id="fromSelect"></select>
+        <select name="" id="toSelect"></select>
+      </div>
+      <div id="out">
+        <input type="text" id="fromInput">
+        <input type="text" id="toInput" readonly>
+      </div>
+    </div>
+
+    <div id="footer">&copy; Neville Omangi, 2018</div>
+  </div>
   <script src="dist/bundle.js"></script>
 </body>
 </html>
