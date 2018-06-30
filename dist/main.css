@@ -2,7 +2,7 @@
   box-sizing: border-box; }
 
 body {
-  background-color: #F5F6F7;
+  background-color: #3a47d5;
   box-sizing: border-box;
   font-family: 'Lato', Arial, Helvetica, sans-serif;
   color: #212121;
@@ -11,6 +11,11 @@ body {
 #header {
   text-align: center;
   color: #fafafa; }
+  #header > #title {
+    letter-spacing: 0.25rem;
+    margin-bottom: 0; }
+  #header > #tag {
+    margin-top: 0; }
 
 #body-wrapper {
   width: 80%;
@@ -19,13 +24,13 @@ body {
 #currency-card {
   width: 80%;
   margin: 0 auto;
-  background-color: whitesmoke;
-  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+  background-color: white;
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.5);
   transition: 0.3s;
   padding: 2%;
   border-radius: 0.5rem; }
   #currency-card:hover {
-    box-shadow: 0 4px 8px 0 rgba(58, 71, 213, 0.5); }
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3); }
 
 #titlebar {
   display: flex;
@@ -44,10 +49,14 @@ body {
     width: 50%;
     margin: 0.5rem 0.5rem 0 0.5rem;
     padding: 1rem 1rem 1rem 1rem;
-    background-color: white;
+    background-color: whiteSmoke;
     border: 1px solid rgba(0, 0, 0, 0.1);
     font-size: 0.9rem;
-    outline-color: rgba(0, 0, 0, 0.1); }
+    outline: none; }
+  #select > select::after {
+    content: '\F078';
+    color: black;
+    pointer-events: none; }
   #select #fromSelect {
     margin-right: 0;
     border-right: none; }
