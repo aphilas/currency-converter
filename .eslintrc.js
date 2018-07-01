@@ -2,6 +2,6 @@ module.exports = {
     "extends": "standard",
     "rules": {
         "semi": [2, "always"],
-        indent: [true, 2]
+        indent: [2, 1]
     }
 };

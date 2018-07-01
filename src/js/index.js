@@ -1,3 +1,12 @@
+import idb from 'idb';
+
+let dbPromise = idb.open('test-db', 1, function (upgradeDb) {
+  switch (upgradeDb.oldVersion) {
+  case 0:
+    upgradeDb.createObjectStore('currencies', { keyPath: 'pair' });
+  }
+});
+
 const url = 'https://free.currencyconverterapi.com/api/v5/currencies';
 
 let fromSelect = document.getElementById('fromSelect');
@@ -59,30 +68,49 @@ fetch(url)
     }
   })
   .catch(err => console.log(err));
-  
-function convert (from, to, amt) {
 
+function convert (from, to, amt) {
   let url = `https://free.currencyconverterapi.com/api/v5/convert?q=${from}_${to}`;
 
-  fetch(url)
-  .then(response => response.json())
-  .then(data => {
-    let conversion = data.results;
+  if (window.fetch(url)){
+    let result = window.fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      let conversion = data.results;
 
-    let value = conversion[Object.keys(conversion)].val;
+      let value = conversion[Object.keys(conversion)].val;
 
-    let converted = amt * value;
-    converted = converted.toFixed(2);
+      let converted = amt * value;
+      converted = converted.toFixed(2);
 
-    toInput.value = converted;
-  });
+      toInput.value = converted;
+    });
+  }else{
+    let pairToConvert = `${from}_${to}`;
+
+    dbPromise.then(function(db) {
+      let tx = db.transaction('currencies', 'readwrite');
+      let keyValStore = tx.objectStore('currencies');
+
+      let result = keyValStore.get(pairToConvert);
+
+      let value = result.value;
+      let converted = amt * value;
+      converted = converted.toFixed(2);
+
+      toInput.value = converted;
+      return tx.complete;
+    });
+  }
 }
 
 // service worker registration
 function registerServiceWorker () {
   if (!navigator.serviceWorker) return;
 
-  navigator.ServiceWorker.register('sw.js').then(function (reg) {
+  navigator.serviceWorker.register('sw.js').then(function (reg) {
+    console.log('service worker installed successfully');
+
     if (!navigator.serviceWorker.controller) {
       return;
     }
@@ -100,7 +128,6 @@ function registerServiceWorker () {
     reg.addEventListener('updatefound', function () {
       console.log('service worker updated');
     });
-
   });
 
   // Ensure refresh is only called once.
@@ -108,9 +135,76 @@ function registerServiceWorker () {
   var refreshing;
   navigator.serviceWorker.addEventListener('controllerchange', function () {
     if (refreshing) return;
-    window.location.reload();
+    location.reload();
     refreshing = true;
   });
 }
 
-// registerServiceWorker();
+registerServiceWorker();
+
+// indexed db
+
+(function(){
+  const url = '';
+
+  function fetchAndStoreCurrencies(){
+    const url = 'https://free.currencyconverterapi.com/api/v5/currencies';
+    
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      let currencies = data.results;
+      return currencies;
+    })
+    .then(currencies => {
+      currenciesArray = Object.values(currencies);
+      let currenciesIds = [];
+      
+      for (let currency of currenciesArray){
+        currenciesIds.push(currency.id);
+      }
+
+      return currenciesIds;
+    }).then(currenciesIds => {
+      let pairs = [];
+
+      for (let i = 0; i < currenciesIds.length - 1; i++) {
+        for (let j = i + 1; j < currenciesIds.length; j++) {
+          pairs.push(`${currenciesIds[i]}_${currenciesIds[j]}`);
+        }
+      }
+
+      return pairs;
+    }).then(pairs => {
+      for (let i = 0; i < pairs.length; i++){
+        let url = `https://free.currencyconverterapi.com/api/v5/convert?q=${pairs[i]}`;
+        
+        fetch(url)
+          .then(response => response.json())
+          .then(res => {
+            let val = res.results;
+            val = Object.values(val)[0].val;
+            let valObj = {
+              pair: pairs[i],
+              value: val
+            };
+            console.log(valObj);
+            return valObj;
+          })
+          .then(valObj => {
+
+            dbPromise.then(function(db) {
+              let tx = db.transaction('currencies', 'readwrite');
+              let keyValStore = tx.objectStore('currencies');
+              keyValStore.put(valObj);
+              return tx.complete;
+            });
+
+          });
+      }
+    });
+  }
+
+  fetchAndStoreCurrencies();
+
+})();
