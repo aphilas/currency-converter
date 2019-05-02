@@ -157,7 +157,7 @@ registerServiceWorker();
       return currencies;
     })
     .then(currencies => {
-      currenciesArray = Object.values(currencies);
+      let currenciesArray = Object.values(currencies);
       let currenciesIds = [];
       
       for (let currency of currenciesArray){
